@@ -39,7 +39,7 @@
 
   h2 {
     margin: 0 0 16px;
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: 0.3px;
     background: linear-gradient(90deg, var(--accent), var(--accent-2));
     -webkit-background-clip: text;
