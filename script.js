@@ -7,12 +7,7 @@ let li = document.createElement("li");
 const STORAGE_KEY = "todoItems";
 
 function save() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-}
-
-function load() {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    items = raw ? JSON.parse(raw) : []; // load the game
+    localStorage.setItem("todoItems", JSON.stringify(items));
 }
 
 
@@ -35,17 +30,24 @@ addButton.addEventListener("click", function() {
         return; // user feedback for too long item::error handled
     }
 
+    const newItem = {
+        text: text,
+        completed: false // default state not completed
+    }
+
     const li = document.createElement("li");
     li.textContent = text;
     li.addEventListener("click", () => {
         li.classList.toggle("completed");
+        newItem.completed = !newItem.completed; // toggle completed state
+        save(); // save to local on toggle
     });
 
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "X";
     deleteBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        const index = items.indexOf(text);
+        const index = items.findIndex((item) => item.text === newItem.text);
         if (index > -1) items.splice(index, 1); // remove item from array
         save(); // save to local
         li.remove(); // remove item from list
@@ -54,7 +56,7 @@ addButton.addEventListener("click", function() {
 
     li.appendChild(deleteBtn);
     list.appendChild(li);
-    items.push(text); // add to array
+    items.push(newItem); // add to array
     save(); // save to local 
 
 
@@ -74,24 +76,39 @@ inputBox.addEventListener("keydown", (e) => {
         addButton.click();
 });
 
-load(); // load items on page load
-for (const t of items) {
-    const li = document.createElement("li");
-    li.textContent = t;
-    li.addEventListener("click", () => {
-        li.classList.toggle("completed");
-    });
+// Load items from localStorage
+function load() {
+    const savedItems = localStorage.getItem("todoItems");
+    if (savedItems) {
+        items = JSON.parse(savedItems);
+        for (const item of items) {
+            const li = document.createElement("li");
+            li.textContent = item.text;
+            if (item.completed) {
+                li.classList.add("completed"); // Apply the "completed" class if the item is marked as completed
+            }
 
-    const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "X";
-    deleteBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const index = items.indexOf(t);
-        if (index > -1) items.splice(index, 1); // remove item from array
-        save(); // save to local
-        li.remove(); // remove item from list
-    })
+            li.addEventListener("click", () => {
+                li.classList.toggle("completed");
+                item.completed = !item.completed; // Update the completed state
+                save(); // Save the updated state
+            });
 
-    li.appendChild(deleteBtn);
-    list.appendChild(li);
+            const deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "X";
+            deleteBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const index = items.findIndex((i) => i.text === item.text);
+                if (index > -1) items.splice(index, 1); // Remove the item from the array
+                save(); // Save the updated array
+                li.remove(); // Remove the item from the DOM
+            });
+
+            li.appendChild(deleteBtn);
+            list.appendChild(li);
+        }
+    }
 }
+
+load(); // load items on page load
+
