@@ -21,8 +21,8 @@ addButton.addEventListener("click", function() {
         alert("Please enter a valid item, for goodness sake!");
         return; // user feedback for empty input::error handled
     }
-    if (items.includes(text)) {
-        alert("This item is already in the list!");
+    if (items.some(item => item.text === text)) {
+        alert("This item is already in the list! Use x2 or more on one item to identify duplicates.");
         return; // user feedback for duplicate item::error handled
     }
     if (text.length > 255) {
@@ -62,7 +62,7 @@ addButton.addEventListener("click", function() {
 
 
     inputBox.value = ""; // clears input box after adding item
-    inputBox.focus(); // Keep the focus on the input box for convenience
+    inputBox.focus(); // keep the focus on the input box for convenience
     
     
     console.log(userText);
@@ -76,7 +76,7 @@ inputBox.addEventListener("keydown", (e) => {
         addButton.click();
 });
 
-// Load items from localStorage
+// load items from localStorage
 function load() {
     const savedItems = localStorage.getItem("todoItems");
     if (savedItems) {
@@ -85,13 +85,13 @@ function load() {
             const li = document.createElement("li");
             li.textContent = item.text;
             if (item.completed) {
-                li.classList.add("completed"); // Apply the "completed" class if the item is marked as completed
+                li.classList.add("completed"); // apply completed class if item is completed
             }
 
             li.addEventListener("click", () => {
                 li.classList.toggle("completed");
-                item.completed = !item.completed; // Update the completed state
-                save(); // Save the updated state
+                item.completed = !item.completed; // update the completed state
+                save(); // save updated state
             });
 
             const deleteBtn = document.createElement("button");
@@ -99,9 +99,9 @@ function load() {
             deleteBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
                 const index = items.findIndex((i) => i.text === item.text);
-                if (index > -1) items.splice(index, 1); // Remove the item from the array
-                save(); // Save the updated array
-                li.remove(); // Remove the item from the DOM
+                if (index > -1) items.splice(index, 1); // remove from array
+                save(); // save updated array
+                li.remove(); // remove item from DOM
             });
 
             li.appendChild(deleteBtn);
